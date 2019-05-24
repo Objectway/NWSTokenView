@@ -526,14 +526,23 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         else // Text View Input
         {
             // Check if text view will overflow current line
-            let maxWidth = self.scrollView.bounds.width - self.tokenViewInsets.left - self.tokenViewInsets.right
+            // Calculate token area width
+            var tokensWidth : CGFloat = self.tokenViewInsets.right
+            if ((dataSource?.numberOfTokensForTokenView(self) ?? 0)>0) {
+                for i in 0...((dataSource?.numberOfTokensForTokenView(self) ?? 0)-1) {
+                    let token = dataSource?.tokenView(self, viewForTokenAtIndex: i)
+                    tokensWidth += (token?.frame.width ?? 0) + self.tokenViewInsets.left
+                }
+            }
+            
+            let maxWidth = self.scrollView.bounds.width - self.tokenViewInsets.left - self.tokenViewInsets.right - tokensWidth //text area max visible width
             let textWidth = self.tokenViewInsets.left + textView.attributedText.size().width + self.tokenViewInsets.right
             
             self.textView.frame.size = CGSize(width: self.textView.frame.size.width, height: self.textView.contentSize.height)
             
             // Check if text is greater than available width (on line with tokens/label), ignore if text view is already on it's own line
             if textWidth >= maxWidth {
-                textView.frame = CGRect(x: self.tokenViewInsets.left, y: self.tokenViewInsets.top, width: max(textView.frame.size.width, textWidth+self.tokenViewInsets.right), height: textView.frame.height)
+                textView.frame = CGRect.init(origin: textView.frame.origin, size: CGSize.init(width: max(textView.frame.size.width, textWidth), height: textView.frame.height))
                 self.scrollView.contentSize = CGSize(width: max(maxWidth, textWidth), height: self.textView.frame.height)
                 self.layoutIfNeeded()
                 self.scrollToRight(offset: textWidth-maxWidth, animated: true)
@@ -561,8 +570,10 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
     
     fileprivate func scrollToRight(offset: CGFloat = 0, animated: Bool)
     {
-        let x = CGPoint(x: self.scrollView.contentSize.width+offset+self.tokenViewInsets.right, y: 0)
+        self.scrollView.bounds.origin = CGPoint.init(x: offset, y: 0)
+        let x = CGPoint(x: offset+self.tokenViewInsets.right, y: 0)
         self.scrollView.setContentOffset(x, animated: animated)
+        self.textView.scrollRangeToVisible(NSRange.init(location: self.textView.text.count, length: 0))
     }
 }
 
