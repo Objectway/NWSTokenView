@@ -21,6 +21,7 @@ public protocol NWSTokenDataSource
     func insetsForTokenView(_ tokenView: NWSTokenView) -> UIEdgeInsets?
     func numberOfTokensForTokenView(_ tokenView: NWSTokenView) -> Int
     func titleForTokenViewLabel(_ tokenView: NWSTokenView) -> String?
+    func imageForTokenViewLabel(_ tokenView: NWSTokenView) -> UIImage?
     func titleForTokenViewPlaceholder(_ tokenView: NWSTokenView) -> String?
     func tokenView(_ tokenView: NWSTokenView, viewForTokenAtIndex index: Int) -> UIView?
 }
@@ -49,6 +50,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
     fileprivate var shouldBecomeFirstResponder: Bool = false
     open var scrollView = UIScrollView()
     open var textView = UITextView()
+    open var offset_left: CGFloat = CGFloat.init(0)
     fileprivate var lastTokenCount = 0
     fileprivate var lastText = ""
     
@@ -242,6 +244,21 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
             self.label.frame = CGRect(x: x, y: y, width: self.label.bounds.width, height: self.labelMinimumHeight)
             self.scrollView.addSubview(self.label)
             x += self.label.bounds.width
+            remainingWidth -= x
+        }
+        else if let imageText = self.dataSource?.imageForTokenViewLabel(self) {
+            self.label.bounds.size = imageText.size
+            let attachment: NSTextAttachment = NSTextAttachment.init()
+            attachment.image = imageText
+            let attachmentString: NSAttributedString = NSAttributedString.init(attachment: attachment)
+            let attributed: NSMutableAttributedString = NSMutableAttributedString.init(attributedString: attachmentString)
+            self.label.attributedText = attributed
+            self.label.frame = CGRect(x: x, y: (self.frame.size.height - imageText.size.height)/2, width: imageText.size.width, height: imageText.size.height)
+            self.label.sizeToFit()
+            // Reset frame after sizeToFit
+            self.scrollView.addSubview(self.label)
+            x = x + self.label.bounds.width + 8
+            self.offset_left = x
             remainingWidth -= x
         }
         
