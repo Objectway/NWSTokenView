@@ -23,11 +23,11 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/Appmazo/NWSTokenView.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/Appmazo'
 
-  s.platform     = :ios, '8.0'
+  s.platform     = :ios, '11.0'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
-  s.resources = 'Pod/Assets/**/*.*'
+  s.resources = 'Pod/Assets/**/*'
   #s.resource_bundles = {
   #  'NWSTokenView' => ['Pod/Assets/*.png']
   #}
