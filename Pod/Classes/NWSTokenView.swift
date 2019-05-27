@@ -4,14 +4,14 @@
 //
 //  Created by James Hickman on 8/11/15.
 /*
-Copyright (c) 2015 Appmazo, LLC
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.//
-*/
+ Copyright (c) 2015 Appmazo, LLC
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.//
+ */
 
 import UIKit
 
@@ -79,7 +79,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
     override open func awakeFromNib()
     {
         super.awakeFromNib()
-
+        
         // Set default scroll properties
         self.scrollView.backgroundColor = UIColor.clear
         self.scrollView.isScrollEnabled = true
@@ -89,13 +89,13 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         self.addSubview(self.scrollView)
         
         // Set default label properties
-        self.label.font = UIFont(name: "HelveticaNeue", size: 14)
-        self.label.textColor = UIColor.red
+        self.label.font = UIFont.systemFont(ofSize: 16)
+        self.label.textColor = UIColor.black
         
         // Set default text view properties
         self.textView.backgroundColor = UIColor.clear
-        self.textView.textColor = UIColor.red
-        self.textView.font = UIFont(name: "HelveticaNeue", size: 14)
+        self.textView.textColor = UIColor.black
+        self.textView.font = UIFont.systemFont(ofSize: 16)
         self.textView.delegate = self
         self.textView.isScrollEnabled = false
         self.textView.autocorrectionType = UITextAutocorrectionType.no // Hide suggestions to prevent UI issues with message bar / keyboard.
@@ -108,7 +108,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         NSLayoutConstraint(item: self.scrollView, attribute: NSLayoutConstraint.Attribute.right, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.right, multiplier: 1.0, constant: 0).isActive = true
         NSLayoutConstraint(item: self.scrollView, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1.0, constant: 0).isActive = true
         NSLayoutConstraint(item: self.scrollView, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1.0, constant: 0).isActive = true
-
+        
         // Orientation Rotation Listener
         NotificationCenter.default.addObserver(self, selector: #selector(NWSTokenView.didRotateInterfaceOrientation), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
@@ -253,7 +253,8 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
             let attachmentString: NSAttributedString = NSAttributedString.init(attachment: attachment)
             let attributed: NSMutableAttributedString = NSMutableAttributedString.init(attributedString: attachmentString)
             self.label.attributedText = attributed
-            self.label.frame = CGRect(x: x, y: (self.frame.size.height - imageText.size.height)/2, width: imageText.size.width, height: imageText.size.height)
+            let height: CGFloat = self.textView.frame.size.height == 0 ? self.frame.size.height : self.textView.frame.size.height
+            self.label.frame = CGRect(x: x, y: (height - imageText.size.height)/2, width: imageText.size.width, height: imageText.size.height)
             self.label.sizeToFit()
             // Reset frame after sizeToFit
             self.scrollView.addSubview(self.label)
@@ -294,11 +295,11 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
             remainingWidth = self.scrollView.bounds.width
             
             // Reset X Offset
-            x = 0
+            x = offset_left
             // Increase Y Offset
             //y += max(self.textViewMinimumHeight, self.tokenHeight) + self.tokenViewInsets.top
             
-            self.textView.frame = CGRect(x: x + self.tokenViewInsets.left, y: y, width: remainingWidth - self.tokenViewInsets.left - self.tokenViewInsets.right, height: self.textView.frame.height)//max(self.textViewMinimumHeight, self.tokenHeight))
+            self.textView.frame = CGRect(x: x, y: y, width: remainingWidth - self.tokenViewInsets.left - self.tokenViewInsets.right, height: self.textView.frame.height)//max(self.textViewMinimumHeight, self.tokenHeight))
         }
         
         self.textView.returnKeyType = UIReturnKeyType.next
@@ -327,10 +328,12 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         // Check if token is out of view's bounds, move to new line if so (unless its first token, truncate it)
         if remainingWidth <= self.tokenViewInsets.left + token.frame.width + self.tokenViewInsets.right && self.tokens.count > 1
         {
-            x = 0
+            x = offset_left
             y += token.frame.height + self.tokenViewInsets.top
         }
-        token.frame = CGRect(x: x+self.tokenViewInsets.left, y: y, width: min(token.bounds.width, self.scrollView.bounds.width-x-self.tokenViewInsets.left-self.tokenViewInsets.right), height: token.bounds.height)
+        let height: CGFloat = (self.frame.size.height - tokenHeight)/2
+        
+        token.frame = CGRect(x: x+self.tokenViewInsets.left, y: height, width: token.bounds.width, height: token.bounds.height)
         
         self.scrollView.addSubview(token)
         
@@ -339,11 +342,11 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         remainingWidth = self.scrollView.bounds.width - x
         
         // Check if previously selected (i.e. pre-rotation)
-//        if self.selectedToken != nil && self.selectedToken?.titleLabel.text == token.titleLabel.text
-//        {
-//            self.selectedToken = nil // Reset so selectToken function properly sets token
-//            self.selectToken(token)
-//        }
+        //        if self.selectedToken != nil && self.selectedToken?.titleLabel.text == token.titleLabel.text
+        //        {
+        //            self.selectedToken = nil // Reset so selectToken function properly sets token
+        //            self.selectToken(token)
+        //        }
     }
     
     /// Returns a generated token.
