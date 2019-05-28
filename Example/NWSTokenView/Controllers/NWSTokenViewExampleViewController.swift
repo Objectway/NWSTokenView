@@ -24,6 +24,10 @@ fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 
 class NWSTokenViewExampleViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NWSTokenDataSource, NWSTokenDelegate, UIGestureRecognizerDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate
 {
+    func imageForTokenViewLabel(_ tokenView: NWSTokenView) -> UIImage? {
+        return nil
+    }
+    
     @IBOutlet weak var tokenView: NWSTokenView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var tokenViewHeightConstraint: NSLayoutConstraint!
