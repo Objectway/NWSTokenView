@@ -106,9 +106,9 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         self.scrollView.addSubview(self.textView)
         
         self.cancel = UIButton.init(type: .custom)
-        let cancelImg: UIImage = UIImage(named: "cancel") ?? UIImage.init()
+        let cancelImg: UIImage = UIImage(named: "cancel_search") ?? UIImage.init()
         self.cancel?.setImage(cancelImg, for: .normal)
-        self.cancel?.frame = CGRect.init(origin: CGPoint.init(x: (self.textView.frame.size.width - cancelImg.size.width - trailing), y: self.textView.frame.size.height/2 - cancelImg.size.height/2), size: cancelImg.size)
+        self.cancel?.frame = CGRect.init(origin: CGPoint.init(x: (self.scrollView.frame.size.width - cancelImg.size.width - trailing), y: self.scrollView.frame.size.height/2 - cancelImg.size.height/2), size: cancelImg.size)
         self.cancel?.backgroundColor = .clear
         self.cancel?.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
         self.cancel?.isHidden = true
@@ -626,6 +626,3 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         self.cancelButtonShow()
     }
 }
-
-
-
