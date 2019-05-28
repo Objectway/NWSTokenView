@@ -112,7 +112,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         self.cancel?.backgroundColor = .clear
         self.cancel?.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
         self.cancel?.isHidden = true
-        self.scrollView.addSubview(self.cancel!)
+        self.addSubview(self.cancel!)
         
         
         
@@ -264,7 +264,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
             self.label.sizeToFit()
             // Reset frame after sizeToFit
             self.label.frame = CGRect(x: x, y: y, width: self.label.bounds.width, height: self.labelMinimumHeight)
-            self.scrollView.addSubview(self.label)
+            self.addSubview(self.label)
             x += self.label.bounds.width
             remainingWidth -= x
         }
@@ -279,7 +279,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
             self.label.frame = CGRect(x: x, y: (height - imageText.size.height)/2, width: imageText.size.width, height: imageText.size.height)
             self.label.sizeToFit()
             // Reset frame after sizeToFit
-            self.scrollView.addSubview(self.label)
+            self.addSubview(self.label)
             x = x + self.label.bounds.width + 8
             self.offset_left = x
             remainingWidth -= x
@@ -365,6 +365,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         x += self.tokenViewInsets.left + token.frame.width
         remainingWidth = self.scrollView.bounds.width - x
         
+        self.cancelButtonShow()
         // Check if previously selected (i.e. pre-rotation)
 //        if self.selectedToken != nil && self.selectedToken?.titleLabel.text == token.titleLabel.text
 //        {
@@ -490,7 +491,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
                 }
             }
         }
-        
+        self.cancelButtonShow()
         self.delegate?.tokenViewDidEndEditing(self)
     }
     
@@ -509,6 +510,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
                 
                 // Delete Token
                 self.delegate?.tokenView(self, didDeleteTokenAtIndex: textView.tag)
+                self.cancelButtonShow()
             }
             // Don't allow new characters to be entered or backspace wont delete token
             return false
@@ -540,7 +542,6 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
                 return false
             }
         }
-        self.cancelButtonShow(futureText: text)
         return true
     }
     
@@ -583,6 +584,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
             self.textView.layoutIfNeeded()
             self.delegate?.tokenView(self, didChangeText: textView.text)
         }
+        self.cancelButtonShow()
     }
     
     /// Dismiss keyboard and resign responder for Token View
@@ -609,14 +611,19 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         //self.scrollView.scrollRectToVisible(CGRect.init(origin: CGPoint.init(x: self.scrollView.contentSize.width, y: 0), size: CGSize.zero), animated: animated)
     }
     
-    fileprivate func cancelButtonShow(futureText: String?) {
+    fileprivate func cancelButtonShow() {
         
-        self.cancel?.isHidden =  self.textView.text.isEmpty && (futureText?.isEmpty ?? true)
-        
+        self.cancel?.isHidden = self.textView.text.isEmpty && self.tokens.count <= 0
+        self.cancel?.frame = CGRect.init(origin: CGPoint.init(x: (self.scrollView.frame.size.width - (self.cancel?.frame.size.width)! - trailing), y: (self.cancel?.frame.origin.y)!), size: (self.cancel?.frame.size)!)
+        self.cancel?.layoutIfNeeded()
     }
     
     @objc func clearSearchText() {
-        
+        self.textView.text = ""
+        for token in self.tokens {
+            self.delegate?.tokenView(self, didDeleteTokenAtIndex: token.tag)
+        }
+        self.cancelButtonShow()
     }
 }
 
