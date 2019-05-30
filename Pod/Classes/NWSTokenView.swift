@@ -4,14 +4,14 @@
 //
 //  Created by James Hickman on 8/11/15.
 /*
-Copyright (c) 2015 Appmazo, LLC
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.//
-*/
+ Copyright (c) 2015 Appmazo, LLC
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.//
+ */
 
 import UIKit
 
@@ -56,8 +56,8 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
     // MARK: Public Vars
     open var scrollView = UIScrollView()
     open var textView = UITextView()
-    open var offset_left: CGFloat = CGFloat.init(0)
-    var label = UILabel()
+    open var offset_left: CGFloat = CGFloat.init(30)
+    open var label = UILabel()
     var tokens: [NWSToken] = []
     var selectedToken: NWSToken?
     var cancel: UIButton?
@@ -82,14 +82,12 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
     override open func awakeFromNib()
     {
         super.awakeFromNib()
-
+        
         // Set default scroll properties
         self.scrollView.backgroundColor = UIColor.clear
         self.scrollView.isScrollEnabled = true
-        //self.scrollView.bounces = false
         self.scrollView.isUserInteractionEnabled = true
         self.scrollView.autoresizesSubviews = false
-        self.scrollView.contentSize = CGSize(width: self.scrollView.bounds.width, height: self.textView.frame.height)
         self.addSubview(self.scrollView)
         
         // Set default label properties
@@ -98,8 +96,6 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         
         // Set default text view properties
         self.textView.backgroundColor = UIColor.clear
-        self.textView.textColor = UIColor.black
-        self.textView.font = UIFont.systemFont(ofSize: 16)
         self.textView.delegate = self
         self.textView.isScrollEnabled = false
         self.textView.autocorrectionType = UITextAutocorrectionType.no // Hide suggestions to prevent UI issues with message bar / keyboard.
@@ -108,8 +104,9 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         self.cancel = UIButton.init(type: .custom)
         let cancelImg: UIImage = UIImage(named: "cancel_search") ?? UIImage.init()
         self.cancel?.setImage(cancelImg, for: .normal)
-        self.cancel?.frame = CGRect.init(origin: CGPoint.init(x: (self.scrollView.frame.size.width - cancelImg.size.width - trailing), y: self.scrollView.frame.size.height/2 - cancelImg.size.height/2), size: cancelImg.size)
-        self.cancel?.backgroundColor = .clear
+        self.cancel?.frame = CGRect.init(origin: CGPoint.init(x: (self.frame.size.width - cancelImg.size.width - trailing), y: self.frame.size.height/2 - cancelImg.size.height/2), size: cancelImg.size)
+        self.cancel?.backgroundColor = UIColor(white: 227.0 / 255.0, alpha: 1.0)
+        self.cancel?.layer.zPosition = 1
         self.cancel?.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
         self.cancel?.isHidden = true
         self.addSubview(self.cancel!)
@@ -123,7 +120,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         NSLayoutConstraint(item: self.scrollView, attribute: NSLayoutConstraint.Attribute.right, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.right, multiplier: 1.0, constant: 0).isActive = true
         NSLayoutConstraint(item: self.scrollView, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1.0, constant: 0).isActive = true
         NSLayoutConstraint(item: self.scrollView, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1.0, constant: 0).isActive = true
-
+        
         // Orientation Rotation Listener
         NotificationCenter.default.addObserver(self, selector: #selector(NWSTokenView.didRotateInterfaceOrientation), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
@@ -169,7 +166,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         
         // Track remaining width
         var remainingWidth = self.scrollView.bounds.width
-        var tokenWidth = CGFloat.zero
+        var tokenWidth = CGFloat.init(0)
         
         // Add label
         self.setupLabel(offsetX: &scrollViewOriginX, offsetY: &scrollViewOriginY, remainingWidth:&remainingWidth)
@@ -308,7 +305,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         // Get remaining width on line
         if remainingWidth >= self.textViewMinimumWidth
         {
-            self.textView.frame = CGRect(x: x + self.tokenViewInsets.left, y: y, width: remainingWidth - self.tokenViewInsets.left - self.tokenViewInsets.right, height: self.textView.frame.height)//max(self.textViewMinimumHeight, self.tokenHeight))
+            self.textView.frame = CGRect(x: offset_left, y: y, width: remainingWidth - self.tokenViewInsets.left - self.tokenViewInsets.right, height: self.textView.frame.height)//max(self.textViewMinimumHeight, self.tokenHeight))
             remainingWidth = self.scrollView.bounds.width - x - self.textView.frame.width
         }
         else // Move text view to new line
@@ -352,8 +349,8 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         if remainingWidth <= tokenWidth //&& self.tokens.count > 1
         {
             self.scrollView.contentSize = CGSize.init(width: tokenWidth, height: self.scrollView.contentSize.height)
-//            x = offset_left
-//            y += token.frame.height + self.tokenViewInsets.top
+            //            x = offset_left
+            //            y += token.frame.height + self.tokenViewInsets.top
         }
         let height: CGFloat = (self.frame.size.height - tokenHeight)/2
         
@@ -367,11 +364,11 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         
         self.cancelButtonShow()
         // Check if previously selected (i.e. pre-rotation)
-//        if self.selectedToken != nil && self.selectedToken?.titleLabel.text == token.titleLabel.text
-//        {
-//            self.selectedToken = nil // Reset so selectToken function properly sets token
-//            self.selectToken(token)
-//        }
+        //        if self.selectedToken != nil && self.selectedToken?.titleLabel.text == token.titleLabel.text
+        //        {
+        //            self.selectedToken = nil // Reset so selectToken function properly sets token
+        //            self.selectToken(token)
+        //        }
     }
     
     /// Returns a generated token.
@@ -608,7 +605,7 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         self.scrollView.bounds.origin = CGPoint.init(x: offset+40, y: 0)
         let x = CGPoint(x: offset+40, y: 0)
         self.scrollView.setContentOffset(x, animated: animated)
-        //self.scrollView.scrollRectToVisible(CGRect.init(origin: CGPoint.init(x: self.scrollView.contentSize.width, y: 0), size: CGSize.zero), animated: animated)
+        //self.scrollView.scrollRectToVisible(CGRect.init(origin: CGPoint.init(x: self.scrollView.contentSize.width, y: 0), size: CGSize.init(0)), animated: animated)
     }
     
     fileprivate func cancelButtonShow() {
