@@ -352,7 +352,9 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
         // Check if token is out of view's bounds, move to new line if so (unless its first token, truncate it)
         if remainingWidth <= tokenWidth //&& self.tokens.count > 1
         {
-            self.orizontalScroll(offset: tokenWidth, animated: true)
+            let minimumW = textViewMinimumWidth + (self.cancel?.frame.size.width)! + trailing
+            let offset: CGFloat = abs(remainingWidth - tokenWidth) + max(minimumW, self.textView.frame.size.width)
+            self.orizontalScroll(offset: self.scrollView.contentOffset.x + offset, animated: true)
         }
         let height: CGFloat = (self.frame.size.height - tokenHeight)/2
         
