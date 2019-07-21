@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "NWSTokenView"
-  s.version          = "2.0.4"
+  s.version          = "2.0.5"
   s.summary          = "NWSTokenView is a flexible iOS token view for selecting contacts."
 
   s.description      = <<-DESC
@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://twitter.com/Appmazo'
 
   s.ios.deployment_target = '11.0'
-  s.swift_version = '4.2'
+  s.swift_version = '5.0'
   #s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
