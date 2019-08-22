@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "NWSTokenView"
-  s.version          = "2.0.5"
+  s.version          = "2.0.6"
   s.summary          = "NWSTokenView is a flexible iOS token view for selecting contacts."
 
   s.description      = <<-DESC

@@ -76,13 +76,6 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
     var textViewMinimumWidth: CGFloat = 44.0
     var textViewMinimumHeight: CGFloat = 36.0
     
-    open override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // Update scroll view content size
-        //let contentSize = self.scrollView.contentSize
-        self.scrollView.contentSize = CGSize(width: self.scrollView.bounds.width, height: self.textView.frame.height)
-    }
     
     override open func awakeFromNib()
     {
@@ -572,6 +565,18 @@ open class NWSTokenView: UIView, UIScrollViewDelegate, UITextViewDelegate
                 let deltaOffset: CGFloat = offset - lastOffset + 2
                 lastOffset = offset
                 self.textView.frame.size = CGSize(width: self.textView.frame.size.width + deltaOffset, height: self.frame.height)
+                
+                
+                //non è la cosa migliore lo so, la scrollView.contentSize andava centralizzata in un punto visto che cambia quando cambia il testo o quando si aggiungono token
+                //ma il codice fa già pena cosi
+                if(tokensWidth + self.textView.frame.size.width > self.scrollView.contentSize.width){
+                    let delta = abs(self.scrollView.contentSize.width - (tokensWidth + self.textView.frame.size.width))
+                    self.scrollView.contentSize = CGSize(width: self.scrollView.contentSize.width + delta , height: self.textView.frame.height)
+                }else{
+                    let delta = abs(self.scrollView.contentSize.width - (tokensWidth + self.textView.frame.size.width))
+                    self.scrollView.contentSize = CGSize(width: self.scrollView.contentSize.width - delta , height: self.textView.frame.height)
+                }
+                
                 self.orizontalScroll(offset: self.scrollView.contentOffset.x + deltaOffset, animated: true)
             }
             
